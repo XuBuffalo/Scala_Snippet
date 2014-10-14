@@ -19,4 +19,35 @@ object mergsort {
 
   val x = List(5,7,9,8,1,2,3,4)                   //> x  : List[Int] = List(5, 7, 9, 8, 1, 2, 3, 4)
   val y = mergeSort(x)                            //> y  : List[Int] = List(1, 2, 3, 4, 5, 7, 8, 9)
+  
+  
+  
+    def mergeSort2[T](pred: (T, T) => Boolean)(xs: Stream[T]): Stream[T] = {
+    val m = xs.length / 2
+    if (m == 0) xs
+    else {
+      def merge(ls: Stream[T], rs: Stream[T]): Stream[T] = (ls, rs) match {
+        case (Stream.Empty, _) => rs
+        case (_, Stream.Empty) => ls
+        case (l #:: ls1, r #:: rs1) =>
+          if (pred(l, r)) l #:: merge(ls1, rs)
+          else r #:: merge(ls, rs1)
+      }
+      val (l, r) = xs splitAt m
+      merge(mergeSort2(pred)(l), mergeSort2(pred)(r))
+    }
+  }                                               //> mergeSort2: [T](pred: (T, T) => Boolean)(xs: Stream[T])Stream[T]
+
+  def numbers(remain: Int): Stream[Int] =
+    if (remain == 0) Stream.Empty
+    else Stream.cons(util.Random.nextInt(100), numbers(remain - 1))
+                                                  //> numbers: (remain: Int)Stream[Int]
+
+ 
+  mergeSort2((x: Int, y: Int) => x < y)(numbers(4)).toList
+                                                  //> res0: List[Int] = List(55, 58, 71, 72)
+  
+  numbers(4)                                      //> res1: Stream[Int] = Stream(90, ?)
+  
+  
 }
